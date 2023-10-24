@@ -44,7 +44,7 @@ public class MainActivity2 extends AppCompatActivity {
 
         books= new DataBank().loadShopItems(this.getApplicationContext());
         if(0==books.size()) {
-            books.add(new Book("软件项目管理案例教程（第4版）", R.drawable.book_2));
+            books.add(new Book("软件项目管理案例教程（第4版）", R.drawable.book_no_name));
         }
 
         bookItemAdapter= new BookItemAdapter(books);
