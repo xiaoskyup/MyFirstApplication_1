@@ -1,110 +1,68 @@
 package com.jnu.student;
 
-
-import android.content.Context;
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.ContextMenu;
-import android.view.LayoutInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.lifecycle.Lifecycle;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewpager2.adapter.FragmentStateAdapter;
-import androidx.viewpager2.widget.ViewPager2;
 
-import com.google.android.material.tabs.TabLayout;
-import com.google.android.material.tabs.TabLayoutMediator;
+import android.view.ContextMenu;
+import android.view.LayoutInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
+
 import com.jnu.student.data.Book;
 import com.jnu.student.data.BookItemDetailsActivity;
 import com.jnu.student.data.DataBank;
 
 import java.util.ArrayList;
 
-public class MainActivity2 extends AppCompatActivity {
-    private final String []tabHeaderStrings = {"Book items","News","Map"};
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main2);
+/**
+ * A simple {@link Fragment} subclass.
+ * Use the {@link BookListFragment#newInstance} factory method to
+ * create an instance of this fragment.
+ */
+public class BookListFragment extends Fragment {
 
-        // 从布局文件中查找 ViewPager2 和 TabLayout 对象
-        ViewPager2 viewPager = findViewById(R.id.view_pager);
-        TabLayout tabLayout = findViewById(R.id.tab_layout);
-        // 创建一个新的 FragmentStateAdapter
-        FragmentAdapter fragmentAdapter = new FragmentAdapter(getSupportFragmentManager(), getLifecycle());
+    public static BookListFragment newInstance() {
+        BookListFragment fragment = new BookListFragment();
+        Bundle args = new Bundle();
 
-        // 将 ViewPager2 与 FragmentStateAdapter 关联起来
-        viewPager.setAdapter(fragmentAdapter);
-
-        // 将 TabLayoutMediator 与 ViewPager2 关联起来
-        new TabLayoutMediator(tabLayout, viewPager,
-                (tab, position) ->tab.setText(tabHeaderStrings[position])
-                    // 每个 Tab 指定它对应的标题
-
-        ).attach();
+        fragment.setArguments(args);
+        return fragment;
     }
 
-    private static  class FragmentAdapter extends FragmentStateAdapter {
-        private static final int NUM_TABS=3;
-        public FragmentAdapter(FragmentManager fragmentManager, Lifecycle lifecycle){
-            super(fragmentManager,lifecycle);
-        }
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
 
-        @NonNull
-        @Override
-        public Fragment createFragment(int position) {
-            //根据位置返回对应的Fragment实例
-            switch (position){
-                case 0:
-                    return new BookListFragment();
-                case 1:
-                    return new WebViewFragment();
-                case 2:
-                    return new MapFragment();
-                default:
-                    return null;
-            }
-
-        }
-
-        @Override
-        public int getItemCount() {
-            return NUM_TABS;
         }
     }
-}
-
-    /*private ArrayList<Book> books=new ArrayList<>();
-    private BookItemAdapter bookItemAdapter;
-    private Context MainActivity2;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main2);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View rootView= inflater.inflate(R.layout.fragment_book_list, container, false);
 
-        RecyclerView mainrecyclerView=findViewById(R.id.recycle_view_books);
-        mainrecyclerView.setLayoutManager(new LinearLayoutManager(this));   //设置布局管理器
+        RecyclerView mainrecyclerView=rootView.findViewById(R.id.recycle_view_books);
+        mainrecyclerView.setLayoutManager(new LinearLayoutManager(requireActivity()));   //设置布局管理器
 
         //ArrayList<Book> books= new ArrayList<>();
 
-        books= new DataBank().loadShopItems(this.getApplicationContext());
+        books= new DataBank().loadShopItems(requireActivity());
         if(0==books.size()) {
             books.add(new Book("软件项目管理案例教程（第4版）", R.drawable.book_no_name));
         }
@@ -119,7 +77,7 @@ public class MainActivity2 extends AppCompatActivity {
         updataItemLauncher= registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
-                    if (result.getResultCode() == RESULT_OK) {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
                         Intent data = result.getData();
                         if (data != null) {
                             int position=data.getIntExtra("position",-1);
@@ -128,9 +86,9 @@ public class MainActivity2 extends AppCompatActivity {
                             Book book=books.get(position);
                             book.setTitle(name);
 
-                           //刷新
-                           bookItemAdapter.notifyItemChanged(position);
-                           new DataBank().SavebookItems(MainActivity2.this, books);
+                            //刷新
+                            bookItemAdapter.notifyItemChanged(position);
+                            new DataBank().SavebookItems(requireActivity(), books);
                         }
                     }
                 });
@@ -138,19 +96,33 @@ public class MainActivity2 extends AppCompatActivity {
         addItemLauncher= registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
-                    if (result.getResultCode() == RESULT_OK) {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
                         Intent data = result.getData();
                         if (data != null) {
                             String name=data.getStringExtra("name");
                             books.add(new Book(name,R.drawable.book_no_name));
                             //刷新
                             bookItemAdapter.notifyItemInserted(books.size());
-                            new DataBank().SavebookItems(this.getApplicationContext(), books);
+                            new DataBank().SavebookItems(requireActivity(), books);
                         }
                     }
                 });
 
+        Button button = rootView.findViewById(R.id.button_add);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 处理点击事件的逻辑
+                Intent intent = new Intent(requireActivity(), BookItemDetailsActivity.class);
+                addItemLauncher.launch(intent);
+            }
+        });
+
+        return rootView;
     }
+    private ArrayList<Book> books=new ArrayList<>();
+    private BookItemAdapter bookItemAdapter;
+
 
     ActivityResultLauncher<Intent> addItemLauncher;
     ActivityResultLauncher<Intent> updataItemLauncher;
@@ -160,12 +132,12 @@ public class MainActivity2 extends AppCompatActivity {
         switch (item.getItemId()) {
             case 0:
 
-                Intent intent = new Intent(MainActivity2.this, BookItemDetailsActivity.class);
+                Intent intent = new Intent(requireActivity(), BookItemDetailsActivity.class);
                 addItemLauncher.launch(intent);
 
                 break;
             case 1:
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
                 builder.setTitle("确认删除");
                 builder.setMessage("确认删除数据吗？");
                 builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
@@ -174,7 +146,7 @@ public class MainActivity2 extends AppCompatActivity {
                         // 用户点击确认按钮，执行删除数据的操作
                         books.remove(item.getOrder());
                         bookItemAdapter.notifyItemRemoved(item.getOrder());
-                        new DataBank().SavebookItems(MainActivity2.this, books);
+                        new DataBank().SavebookItems(requireActivity(), books);
 
                     }
                 });
@@ -183,7 +155,7 @@ public class MainActivity2 extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         // 用户点击取消按钮，不执行删除数据的操作
                         // 可以执行其他适当的操作或返回先前的界面
-                
+
                     }
                 });
                 AlertDialog dialog = builder.create();
@@ -192,7 +164,7 @@ public class MainActivity2 extends AppCompatActivity {
             // 可以继续添加其他的菜单项处理逻辑
 
             case 2:
-                Intent intentUpdata = new Intent(MainActivity2.this, BookItemDetailsActivity.class);
+                Intent intentUpdata = new Intent(requireActivity(), BookItemDetailsActivity.class);
                 Book book=books.get(item.getOrder());
                 intentUpdata.putExtra("name",book.getTitle());
                 intentUpdata.putExtra("position",item.getOrder());
@@ -205,10 +177,7 @@ public class MainActivity2 extends AppCompatActivity {
         return true;
     }
 
-    public void myButtonClick(View view) {
-        Intent intent = new Intent(MainActivity2.this, BookItemDetailsActivity.class);
-        addItemLauncher.launch(intent);
-    }
+
 
     public static class BookItemAdapter extends RecyclerView.Adapter<BookItemAdapter.ViewHolder> {
 
@@ -217,7 +186,7 @@ public class MainActivity2 extends AppCompatActivity {
         /**
          * Provide a reference to the type of views that you are using
          * (custom ViewHolder).
-         *//*
+         */
         public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener{
             private final TextView textViewName;            //书名
             private final ImageView imageViewItem;          //图片
@@ -249,14 +218,14 @@ public class MainActivity2 extends AppCompatActivity {
                 return imageViewItem;
             }
         }
-        */
-        /*
-         * Initialize the dataset of the Adapter.
-         *
-         * @param dataSet String[] containing the data to populate views to be used
-         * by RecyclerView.
-         */
+
     /*
+     * Initialize the dataset of the Adapter.
+     *
+     * @param dataSet String[] containing the data to populate views to be used
+     * by RecyclerView.
+     */
+
         public BookItemAdapter(ArrayList<Book> dataSet) {
             localDataSet = dataSet;
         }
@@ -288,4 +257,5 @@ public class MainActivity2 extends AppCompatActivity {
         public int getItemCount() {
             return localDataSet.size();
         }
-    }*/
+    }
+}
