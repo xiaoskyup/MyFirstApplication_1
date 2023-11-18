@@ -55,29 +55,6 @@ public class MapFragment extends Fragment {
         }
     }
     private com.tencent.tencentmap.mapsdk.maps.MapView mapView = null;
-    public class DataDownloadTask extends AsyncTask<String, Void, String> {
-        @Override
-        protected String doInBackground(String... urls) {
-            return new DataDownload().download(urls[0]);
-        }
-        @Override
-        protected void onPostExecute(String responseData) {
-            super.onPostExecute(responseData);
-            if (responseData != null) {
-                ArrayList<ShopLocation> shopLocations= new DataDownload().parseJsonObjects(responseData);
-                TencentMap tencentMap = mapView.getMap();
-                for (ShopLocation shopLocation : shopLocations) {
-                    LatLng point1 = new LatLng(shopLocation.getLatitude(), shopLocation.getLongitude());
-                    MarkerOptions markerOptions = new MarkerOptions(point1)
-                            .title(shopLocation.getName());
-                    Marker marker = tencentMap.addMarker(markerOptions);
-
-
-                }
-            }
-        }
-    }
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
