@@ -37,7 +37,7 @@ import com.jnu.student.data.DataBank;
 import java.util.ArrayList;
 
 public class MainActivity2 extends AppCompatActivity {
-    private final String []tabHeaderStrings = {"Book items","News","Map","Clock"};
+    private final String []tabHeaderStrings = {"Book items","News","Map","Clock","Game"};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,7 +61,7 @@ public class MainActivity2 extends AppCompatActivity {
     }
 
     private static  class FragmentAdapter extends FragmentStateAdapter {
-        private static final int NUM_TABS=4;
+        private static final int NUM_TABS=5;
         public FragmentAdapter(FragmentManager fragmentManager, Lifecycle lifecycle){
             super(fragmentManager,lifecycle);
         }
@@ -79,6 +79,8 @@ public class MainActivity2 extends AppCompatActivity {
                     return new MapFragment();
                 case 3:
                     return new ClockViewFragment();
+                case 4:
+                    return new GameViewFragment();
                 default:
                     return null;
             }
